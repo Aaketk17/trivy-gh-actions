@@ -22,7 +22,7 @@ jobs:
       - name: Test Trivy
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: ${{ needs.build_and_test.outputs.image_name }}
+          image-ref: ${{ steps.test_image.outputs.image_name }}
           format: "sarif"
           exit-code: "0"
           ignore-unfixed: true
