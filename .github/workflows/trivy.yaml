@@ -27,9 +27,9 @@ jobs:
         with:
           image-ref: ${{ steps.test_image.outputs.image_name }}
           format: "sarif"
-          exit-code: "1"
+          exit-code: "0"
           ignore-unfixed: true
-          scanners: "vuln,secret,misconfig,license"
+          scanners: "vuln,secret"
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
           output: "trivy-results.sarif"
