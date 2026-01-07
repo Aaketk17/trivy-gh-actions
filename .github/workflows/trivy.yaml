@@ -38,9 +38,10 @@ jobs:
         if: always()
         with:
           sarif_file: "trivy-results-am.sarif"
+          category: am-results
   build_and_test_mi:
     runs-on: ubuntu-latest
-    name: Build APIM Image
+    name: Build MI Image
     permissions:
       contents: read
       security-events: write
@@ -70,3 +71,5 @@ jobs:
         if: always()
         with:
           sarif_file: "trivy-results-mi.sarif"
+          category: mi-results
+
