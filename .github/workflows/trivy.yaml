@@ -9,6 +9,9 @@ jobs:
   build_and_test:
     runs-on: ubuntu-latest
     name: Build APIM Image
+    permissions:
+      contents: read
+      security-events: write
     outputs:
       image_name: ${{ steps.test_image.outputs.image_name }}
     steps:
