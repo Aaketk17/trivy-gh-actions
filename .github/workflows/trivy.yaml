@@ -18,7 +18,7 @@ jobs:
         id: test_image
         run: |
           echo "Building image and pushing to Amazon ECR"
-          echo "image_name=nginx:latest" >> "$GITHUB_OUTPUT"
+          echo "image_name=nginx:trixie-perl" >> "$GITHUB_OUTPUT"
       - name: Test Trivy
         uses: aquasecurity/trivy-action@0.33.1
         with:
