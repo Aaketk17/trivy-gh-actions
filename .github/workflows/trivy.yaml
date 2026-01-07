@@ -1,0 +1,41 @@
+name: Test Trivy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build APIM Image
+    outputs:
+      image_name: ${{ steps.test_image.outputs.image_name }} 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build, tag, and push docker image to Amazon ECR
+        id: test_image
+        env:
+          REGISTRY: ${{ steps.login_ecr.outputs.registry }}
+          REPOSITORY: ${{ inputs.IMAGE_NAME }}
+          IMAGE_TAG: main-${{ inputs.IMAGE_TAG_PREFIX }}-${{ github.sha }}
+        run: |
+          echo "Building image and pushing to Amazon ECR"
+          echo "image_name=nginx:latest" >> "$GITHUB_OUTPUT"
+      - name: Test Trivy
+        uses: aquasecurity/trivy-action@v2
+        with:
+          image-ref: ${{ needs.build-and-test.outputs.image_name }} 
+          format: 'sarif'
+          exit-code: '0'
+          ignore-unfixed: true
+          scanners: 'vuln,secret,misconfig,license'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          output: 'trivy-results.sarif'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
