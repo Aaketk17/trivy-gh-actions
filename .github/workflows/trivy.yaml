@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build_and_test:
+  build_and_test_am:
     runs-on: ubuntu-latest
     name: Build APIM Image
     permissions:
@@ -32,9 +32,41 @@ jobs:
           scanners: "vuln,secret"
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
-          output: "trivy-results.sarif"
+          output: "trivy-results-am.sarif"
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: "trivy-results.sarif"
+          sarif_file: "trivy-results-am.sarif"
+  build_and_test_mi:
+    runs-on: ubuntu-latest
+    name: Build APIM Image
+    permissions:
+      contents: read
+      security-events: write
+    outputs:
+      image_name: ${{ steps.test_image.outputs.image_name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build, tag, and push docker image to Amazon ECR
+        id: test_image
+        run: |
+          echo "Building image and pushing to Amazon ECR"
+          echo "image_name=wso2/wso2mi" >> "$GITHUB_OUTPUT"
+      - name: Test Trivy
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: ${{ steps.test_image.outputs.image_name }}
+          format: "sarif"
+          exit-code: "0"
+          ignore-unfixed: true
+          scanners: "vuln,secret"
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
+          output: "trivy-results-mi.sarif"
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: "trivy-results-mi.sarif"
