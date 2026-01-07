@@ -13,32 +13,50 @@ jobs:
       contents: read
       security-events: write
     outputs:
-      image_name: ${{ steps.test_image.outputs.image_name }}
+      am_image_name: ${{ steps.test_am_image.outputs.am_image_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Build, tag, and push docker image to Amazon ECR
-        id: test_image
+        id: test_am_image
         run: |
           echo "Building image and pushing to Amazon ECR"
-          echo "image_name=wso2/wso2am" >> "$GITHUB_OUTPUT"
-      - name: Test Trivy
+          echo "am_image_name=wso2/wso2am" >> "$GITHUB_OUTPUT"
+
+      - name: Test Trivy AM vuln scan
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: ${{ steps.test_image.outputs.image_name }}
+          image-ref: ${{ steps.test_am_image.outputs.am_image_name }}
           format: "sarif"
           exit-code: "0"
           ignore-unfixed: true
-          scanners: "vuln,secret"
+          scanners: "vuln"
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
-          output: "trivy-results-am.sarif"
+          output: "trivy-results-am-vuln.sarif"
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: "trivy-results-am.sarif"
-          category: am-results
+          sarif_file: "trivy-results-am-vuln.sarif"
+          category: am-results-vuln-scan
+
+      - name: Test Trivy AM secret scan
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: ${{ steps.test_am_image.outputs.am_image_name }}
+          format: "sarif"
+          exit-code: "0"
+          ignore-unfixed: true
+          scanners: "secret"
+          output: "trivy-results-am-secret.sarif"
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: "trivy-results-am-secret.sarif"
+          category: am-results-secret-scan
+
   build_and_test_mi:
     runs-on: ubuntu-latest
     name: Build MI Image
@@ -46,30 +64,47 @@ jobs:
       contents: read
       security-events: write
     outputs:
-      image_name: ${{ steps.test_image.outputs.image_name }}
+      mi_image_name: ${{ steps.test_mi_image.outputs.mi_image_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Build, tag, and push docker image to Amazon ECR
-        id: test_image
+        id: test_mi_image
         run: |
           echo "Building image and pushing to Amazon ECR"
-          echo "image_name=wso2/wso2mi" >> "$GITHUB_OUTPUT"
-      - name: Test Trivy
+          echo "mi_image_name=wso2/wso2mi" >> "$GITHUB_OUTPUT"
+
+      - name: Test Trivy MI vuln scan
         uses: aquasecurity/trivy-action@0.33.1
         with:
-          image-ref: ${{ steps.test_image.outputs.image_name }}
+          image-ref: ${{ steps.test_mi_image.outputs.mi_image_name }}
           format: "sarif"
           exit-code: "0"
           ignore-unfixed: true
-          scanners: "vuln,secret"
+          scanners: "vuln"
           vuln-type: "os,library"
-          severity: CRITICAL,HIGH
-          output: "trivy-results-mi.sarif"
+          severity: "CRITICAL,HIGH"
+          output: "trivy-results-mi-vuln.sarif"
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: "trivy-results-mi.sarif"
-          category: mi-results
+          sarif_file: "trivy-results-mi-vuln.sarif"
+          category: mi-results-vuln-scan
+
+      - name: Test Trivy MI secret scan
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: ${{ steps.test_mi_image.outputs.mi_image_name }}
+          format: "sarif"
+          exit-code: "0"
+          ignore-unfixed: true
+          scanners: "secret"
+          output: "trivy-results-mi-secret.sarif"
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: "trivy-results-mi-secret.sarif"
+          category: mi-results-secret-scan
 
