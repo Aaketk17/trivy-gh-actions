@@ -16,10 +16,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Build, tag, and push docker image to Amazon ECR
         id: test_image
-        env:
-          REGISTRY: ${{ steps.login_ecr.outputs.registry }}
-          REPOSITORY: ${{ inputs.IMAGE_NAME }}
-          IMAGE_TAG: main-${{ inputs.IMAGE_TAG_PREFIX }}-${{ github.sha }}
         run: |
           echo "Building image and pushing to Amazon ECR"
           echo "image_name=nginx:latest" >> "$GITHUB_OUTPUT"
