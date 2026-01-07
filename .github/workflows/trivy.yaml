@@ -27,7 +27,7 @@ jobs:
         with:
           image-ref: ${{ steps.test_image.outputs.image_name }}
           format: "sarif"
-          exit-code: "0"
+          exit-code: "1"
           ignore-unfixed: true
           scanners: "vuln,secret,misconfig,license"
           vuln-type: "os,library"
