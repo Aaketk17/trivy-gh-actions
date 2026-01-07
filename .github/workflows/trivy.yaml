@@ -59,6 +59,7 @@ jobs:
   test-jobs:
     runs-on: ubuntu-latest
     name: Build MI Image
+    needs: build_and_test_mi
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -67,4 +68,3 @@ jobs:
         id: update_image_version
         run: |
           echo "Checking out code validitiy"
-
