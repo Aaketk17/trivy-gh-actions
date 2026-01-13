@@ -10,20 +10,25 @@ jobs:
     runs-on: self-hosted
     name: Scan MI/APIM Image
     steps:
+      - name: Build, tag, and push docker image to Amazon ECR
+        id: test_image
+        run: |
+          echo "Building image and pushing to Amazon ECR"
+          echo "mi_image_name=wso2/wso2mi:4.3.0-alpine" >> "$GITHUB_OUTPUT"
+          echo "am_image_name=wso2/wso2am:4.3.0-rocky" >> "$GITHUB_OUTPUT"
+
       - name: Test Trivy MI vuln scan
         run: |
-          trivy image --scanners vuln --format table --severity HIGH,CRITICAL  --exit-code 0 wso2/wso2mi:4.3.0-alpine
+          trivy image --scanners vuln --format table --severity HIGH,CRITICAL  --exit-code 0 ${{ steps.test_image.outputs.mi_image_name }}
 
       - name: Test Trivy MI Secret scan
         run: |
-          trivy image --scanners secret --format table --severity HIGH,CRITICAL  --exit-code 0 wso2/wso2mi:4.3.0-alpine
+          trivy image --scanners secret --format table --severity HIGH,CRITICAL  --exit-code 0 ${{ steps.test_image.outputs.mi_image_name }}
 
       - name: Test Trivy APIM vuln scan
         run: |
-          trivy image --scanners vuln --format table --severity HIGH,CRITICAL  --exit-code 0 wso2/wso2am:4.3.0-rocky
+          trivy image --scanners vuln --format table --severity HIGH,CRITICAL  --exit-code 0 ${{ steps.test_image.outputs.am_image_name }}
 
       - name: Test Trivy APIM Secret scan
         run: |
-          trivy image --scanners secret --format table --severity HIGH,CRITICAL  --exit-code 0 wso2/wso2am:4.3.0-rocky
-
-
+          trivy image --scanners secret --format table --severity HIGH,CRITICAL  --exit-code 0 ${{ steps.test_image.outputs.am_image_name }}
