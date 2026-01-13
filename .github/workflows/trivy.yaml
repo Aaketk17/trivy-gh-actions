@@ -21,14 +21,14 @@ jobs:
         id: test_mi_image
         run: |
           echo "Building image and pushing to Amazon ECR"
-          echo "mi_image_name=wso2/wso2mi" >> "$GITHUB_OUTPUT"
+          echo "mi_image_name=wso2/wso2am" >> "$GITHUB_OUTPUT"
 
       - name: Test Trivy MI vuln scan
-        run: | 
+        run: |
           trivy image --scanners vuln --format table --severity HIGH,CRITICAL  --exit-code 0 ${{ steps.test_mi_image.outputs.mi_image_name }}
 
       - name: Test Trivy MI Secret scan
-        run: | 
+        run: |
           trivy image --scanners secret --format table --severity HIGH,CRITICAL  --exit-code 0 ${{ steps.test_mi_image.outputs.mi_image_name }}
 
       # - name: Upload Trivy scan results to GitHub Security tab
@@ -54,16 +54,3 @@ jobs:
       #   with:
       #     sarif_file: "trivy-results-mi-secret.sarif"
       #     category: mi-results-secret-scan
-  test-jobs:
-    runs-on: self-hosted
-    name: Test MI Image
-    # needs: build_and_test_mi
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Update Image Version
-        id: update_image_version
-        run: |
-          echo "Checking out code validitiy"
-          trivy --version 
