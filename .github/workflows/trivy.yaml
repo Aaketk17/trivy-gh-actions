@@ -24,7 +24,6 @@ jobs:
           echo "mi_image_name=wso2/wso2mi" >> "$GITHUB_OUTPUT"
 
       - name: Test Trivy MI vuln scan
-        uses: aquasecurity/trivy-action@0.33.1
         run: | 
           trivy image --scanners vuln --format sarif --output trivy-results-mi-vul.sarif --severity HIGH,CRITICAL ${{ steps.test_mi_image.outputs.mi_image_name }}
 
