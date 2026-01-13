@@ -19,6 +19,7 @@ jobs:
 
       - name: Test Trivy MI vuln scan
         run: |
+          echo "${{ steps.test_image.outputs.mi_image_name }}"
           trivy image --scanners vuln --format table --severity HIGH,CRITICAL  --exit-code 0 ${{ steps.test_image.outputs.mi_image_name }}
 
       - name: Test Trivy MI Secret scan
@@ -27,6 +28,7 @@ jobs:
 
       - name: Test Trivy APIM vuln scan
         run: |
+          echo "${{ steps.test_image.outputs.am_image_name }}"
           trivy image --scanners vuln --format table --severity HIGH,CRITICAL  --exit-code 0 ${{ steps.test_image.outputs.am_image_name }}
 
       - name: Test Trivy APIM Secret scan
