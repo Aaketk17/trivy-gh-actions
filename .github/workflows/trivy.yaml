@@ -6,59 +6,54 @@ on:
       - main
 
 jobs:
-  # build_and_test_mi:
-  #   runs-on: self-hosted
-  #   name: Build MI Image
-  #   permissions:
-  #     contents: read
-  #     security-events: write
-  #   outputs:
-  #     mi_image_name: ${{ steps.test_mi_image.outputs.mi_image_name }}
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Build, tag, and push docker image to Amazon ECR
-  #       id: test_mi_image
-  #       run: |
-  #         echo "Building image and pushing to Amazon ECR"
-  #         echo "mi_image_name=wso2/wso2mi" >> "$GITHUB_OUTPUT"
-
-  #     - name: Test Trivy MI vuln scan
-  #       uses: aquasecurity/trivy-action@0.33.1
-  #       with:
-  #         image-ref: ${{ steps.test_mi_image.outputs.mi_image_name }}
-  #         format: "sarif"
-  #         exit-code: "1"
-  #         ignore-unfixed: true
-  #         scanners: "vuln"
-  #         vuln-type: "os,library"
-  #         severity: "CRITICAL,HIGH"
-  #         output: "trivy-results-mi-vuln.sarif"
-  #     - name: Upload Trivy scan results to GitHub Security tab
-  #       uses: github/codeql-action/upload-sarif@v4
-  #       if: always()
-  #       with:
-  #         sarif_file: "trivy-results-mi-vuln.sarif"
-  #         category: mi-results-vuln-scan
-
-  #     - name: Test Trivy MI secret scan
-  #       uses: aquasecurity/trivy-action@0.33.1
-  #       with:
-  #         image-ref: ${{ steps.test_mi_image.outputs.mi_image_name }}
-  #         format: "sarif"
-  #         exit-code: "1"
-  #         ignore-unfixed: true
-  #         scanners: "secret"
-  #         output: "trivy-results-mi-secret.sarif"
-  #     - name: Upload Trivy scan results to GitHub Security tab
-        # uses: github/codeql-action/upload-sarif@v4
-        # if: always()
-        # with:
-        #   sarif_file: "trivy-results-mi-secret.sarif"
-        #   category: mi-results-secret-scan
-  test-jobs:
+  build_and_test_mi:
     runs-on: self-hosted
     name: Build MI Image
+    permissions:
+      contents: read
+      security-events: write
+    outputs:
+      mi_image_name: ${{ steps.test_mi_image.outputs.mi_image_name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build, tag, and push docker image to Amazon ECR
+        id: test_mi_image
+        run: |
+          echo "Building image and pushing to Amazon ECR"
+          echo "mi_image_name=wso2/wso2mi" >> "$GITHUB_OUTPUT"
+
+      - name: Test Trivy MI vuln scan
+        uses: aquasecurity/trivy-action@0.33.1
+        run: | 
+          trivy image --scanners vuln --format sarif --output trivy-results-mi-vul.sarif --severity HIGH,CRITICAL ${{ steps.test_mi_image.outputs.mi_image_name }}
+
+      # - name: Upload Trivy scan results to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v4
+      #   if: always()
+      #   with:
+      #     sarif_file: "trivy-results-mi-vuln.sarif"
+      #     category: mi-results-vuln-scan
+
+      # - name: Test Trivy MI secret scan
+      #   uses: aquasecurity/trivy-action@0.33.1
+      #   with:
+      #     image-ref: ${{ steps.test_mi_image.outputs.mi_image_name }}
+      #     format: "sarif"
+      #     exit-code: "1"
+      #     ignore-unfixed: true
+      #     scanners: "secret"
+      #     output: "trivy-results-mi-secret.sarif"
+
+      # - name: Upload Trivy scan results to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v4
+      #   if: always()
+      #   with:
+      #     sarif_file: "trivy-results-mi-secret.sarif"
+      #     category: mi-results-secret-scan
+  test-jobs:
+    runs-on: self-hosted
+    name: Test MI Image
     # needs: build_and_test_mi
     steps:
       - name: Checkout code
