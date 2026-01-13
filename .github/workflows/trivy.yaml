@@ -51,11 +51,11 @@ jobs:
   #         scanners: "secret"
   #         output: "trivy-results-mi-secret.sarif"
   #     - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4
-        if: always()
-        with:
-          sarif_file: "trivy-results-mi-secret.sarif"
-          category: mi-results-secret-scan
+        # uses: github/codeql-action/upload-sarif@v4
+        # if: always()
+        # with:
+        #   sarif_file: "trivy-results-mi-secret.sarif"
+        #   category: mi-results-secret-scan
   test-jobs:
     runs-on: self-hosted
     name: Build MI Image
